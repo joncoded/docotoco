@@ -17,7 +17,6 @@
 from dotenv import load_dotenv
 import os
 
-from sympy import content
 load_dotenv()
 key_model = os.getenv("GROQ_API_KEY").strip()
 key_vecdb = os.getenv("PINECONE_API_KEY").strip()
