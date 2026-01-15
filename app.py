@@ -220,87 +220,93 @@ if uploaded_files:
     # === DOCUMENT SUMMARIZER 
 
     st.header("📄 Summary of document(s)")
+
+    files_shown = 0
     
     # summarize each uploaded file according to user settings
-    for uploaded_file in uploaded_files:
+    for uploaded_file in uploaded_files:        
 
-        with st.expander(f"Summary of {uploaded_file.name} (click to show/hide)", expanded=False):
+        sentiment_subprompt = ""  
+        summary_prompt = f"""
+            <document>
+            {uploaded_file.page_content}
+            </document>
+            
+            <request>
+            Summarize this document in {summary_sentences} sentences, with {summary_bullets} bullet points, each no more than 15 words, about its main theme.
+            </request>
 
-            sentiment_subprompt = ""  
-            summary_prompt = f"""
-                <document>
-                {uploaded_file.page_content}
-                </document>
-                
-                <request>
-                Summarize this document in {summary_sentences} sentences, with {summary_bullets} bullet points, each no more than 15 words, about its main theme.
-                </request>
+            
+        """
 
-                
+        # subprompt for sentiment analysis
+        if summary_sentiment == "Yes":
+
+            sentiment_subprompt += f"""
+
+            <additional_request>
+                Additionally, provide a brief sentiment analysis of the document in a short sentence, focusing on the overall tone and emotion of the main topic.
+            </additional_request>   
+
+            <append_to_format>
+            **Sentiment Analysis**:
+            A brief sentence about the overall tone and emotion of the document.
+            </append_to_format>
+
             """
 
-            # subprompt for sentiment analysis
-            if summary_sentiment == "Yes":
+        # subpromopt for named entity recognition 
+        if summary_ner == "Yes":
 
-                sentiment_subprompt += f"""
+            ner_subprompt = f"""
 
-                <additional_request>
-                    Additionally, provide a brief sentiment analysis of the document in a short sentence, focusing on the overall tone and emotion of the main topic.
-                </additional_request>   
+            <additional_request>
+                Additionally, provide a list of named entities found in the document, categorized by type (e.g., persons, organizations, locations).
+            </additional_request>
 
-                <append_to_format>
-                **Sentiment Analysis**:
-                A brief sentence about the overall tone and emotion of the document.
-                </append_to_format>
-
-                """
-
-            # subpromopt for named entity recognition 
-            if summary_ner == "Yes":
-
-                ner_subprompt = f"""
-
-                <additional_request>
-                    Additionally, provide a list of named entities found in the document, categorized by type (e.g., persons, organizations, locations).
-                </additional_request>
-
-                <append_to_format>
-                **Named Entities**:
-                - Persons: list of persons, do not include this line if no persons were found
-                - Organizations: list of organizations, do not include this line if no organizations were found
-                - Locations: list of locations, do not include this line if no locations were found
-                - If no named entities were found, state "No named entities found!"
-                </addition_to_format>
-                """
-
-            # combine subprompts into main prompt
-            summary_prompt += f"""
-
-                <format>
-                Summary of {summary_sentences} sentence outlining the main themes of the document, with a clause that flows smoothly into the bullet points:
-                * Bullet points with themes related to the summary sentence
-
-                {sentiment_subprompt if summary_sentiment == "Yes" else ""}
-
-                {ner_subprompt if summary_ner == "Yes" else ""}
-                
-                </format>
+            <append_to_format>
+            **Named Entities**:
+            - Persons: list of persons, do not include this line if no persons were found
+            - Organizations: list of organizations, do not include this line if no organizations were found
+            - Locations: list of locations, do not include this line if no locations were found
+            - If no named entities were found, state "No named entities found!"
+            </addition_to_format>
             """
+
+        # combine subprompts into main prompt
+        summary_prompt += f"""
+
+            <format>
+            Summary of {summary_sentences} sentence outlining the main themes of the document, with a clause that flows smoothly into the bullet points:
+            * Bullet points with themes related to the summary sentence
+
+            \n\n {sentiment_subprompt if summary_sentiment == "Yes" else ""}
+
+            \n\n {ner_subprompt if summary_ner == "Yes" else ""}
             
-            # get final response!
-            summary_response = client.chat.completions.create(
-                model=use_model,
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant designed to summarize PDF documents."},
-                    {"role": "user", "content": summary_prompt}
-                ]
-            )
-            
-            summary_answer = summary_response.choices[0].message.content
-            
-            st.write(summary_answer)
-                
-    
+            </format>
+        """
+        
+        # get final response!
+        summary_response = client.chat.completions.create(
+            model=use_model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant designed to summarize PDF documents."},
+                {"role": "user", "content": summary_prompt}
+            ]
+        )
+        
+        summary_answer = summary_response.choices[0].message.content    
+
+        if summary_answer:
+
+            expanded = True if files_shown == 0 else False
+            with st.expander(f"Summary of {uploaded_file.name} (click to show/hide)", expanded=expanded):
+
+                st.write(summary_answer)
+
+        files_shown += 1
+                    
     st.write("✅ Document(s) loaded ... if you want, we can discuss about them!")
 
     if 'qa_history' not in st.session_state:
