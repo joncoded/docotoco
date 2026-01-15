@@ -1,18 +1,17 @@
 # jonorags by @joncoded (aka @jonchius)
 # app.py
+#
 # requirements:
 # - input PDF documents and get a variable-sized summary
 # - using vector store + retriever + LLM with streamlit UI
 # - ability to ask questions and get answers based on PDF contents
-# goals:
-# - document summary of single document
-# - document summary of multiple documents
+#
 # enhancements:
 # - adjustable summary length
 # - sentiment analysis
 # - find named entities
 
-# === API KEYS (stored in environment variables)
+# === API KEYS (stored in a .env file or in "secrets" on streamlit)
 from dotenv import load_dotenv
 import os
 
