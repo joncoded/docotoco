@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-key_model = os.getenv("GROQ_API_KEY").strip()
+key_myllm = os.getenv("GROQ_API_KEY").strip()
 key_vecdb = os.getenv("PINECONE_API_KEY").strip()
 
 # === VECTOR DB CONNECTION
@@ -29,7 +29,7 @@ index = pinecone.Index(index_name=index_name, host=host)
 # === LLM CONNECTION 
 from openai import OpenAI
 client = OpenAI(
-    api_key=key_model,
+    api_key=key_myllm,
     base_url="https://api.groq.com/openai/v1"
 )
 use_model = "groq/compound-mini"
