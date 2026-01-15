@@ -21,7 +21,7 @@ run the following commands on your command line:
 
 ### .env file
 
-configure your .env file on the root folder (this must be done or the code will tell you to):
+configure your `.env` file on the root folder (this must be done or the code will tell you to):
 
 ```
 GROQ_API_KEY=your_groq_api_key
