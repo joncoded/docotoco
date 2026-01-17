@@ -41,4 +41,4 @@ streamlit run app.py
 ### localization
 
 * translate the app into your language with the `local.py` dictionary file
-* go to `app.py` and change the `text` variable, e.g. `l['en']` to `l['fr']` for French
+* go to `app.py` and check/change the `lang_options` variable

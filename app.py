@@ -36,6 +36,7 @@ load_dotenv()
 # =========================================================
 
 # language constants
+lang_options = {"English": "en", "Français": "fr"}
 text = l["en"]
 
 # pinecone
@@ -157,7 +158,6 @@ header(f"<h1 style=\"font-size:24px\">{app_title}</h1><div style=\"font-size:12p
 st.write("<br><br>", unsafe_allow_html = True)
 
 # language selector (proof of concept)
-lang_options = {"English": "en", "Français": "fr"}
 selected_lang_label = st.selectbox(
     "Language",
     list(lang_options.keys()),
