@@ -39,12 +39,11 @@ load_dotenv()
 text = l["en"]
 
 # pinecone
-use_index = "jonsrags"
-use_phost = "https://jonsrags-su5cgy0.svc.aped-4627-b74a.pinecone.io"
+use_index = os.getenv("PINECONE_INDEX").strip()
+use_phost = os.getenv("PINECONE_HOST").strip()
 
 # llm
 use_myllm = "openai/gpt-oss-120b"
-max_tokens = 1000
 
 # ui
 app_title = "JONORAGS ❇️"
