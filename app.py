@@ -127,11 +127,6 @@ if "should_scroll" not in st.session_state:
 
 st.set_page_config(page_title = app_title, page_icon = "📄")
 
-# fix for uploader in mobile phones
-st.set_option('client.toolbarMode', 'minimal')
-st.set_option('server.enableXsrfProtection', False)  
-st.set_option('server.enableCORS', True)  
-
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
