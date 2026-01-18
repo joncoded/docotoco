@@ -48,7 +48,7 @@ use_myllm = "openai/gpt-oss-120b"
 
 # ui
 app_title = "JONORAGS ❇️"
-app_tagline = "pdf summarizer and discusser"
+app_tagline = "pdf summarizer and discusser by @joncoded"
 
 # =========================================================
 # API KEYS
