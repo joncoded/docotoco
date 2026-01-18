@@ -97,6 +97,9 @@ if "last_uploaded_files" not in st.session_state:
 if "summaries" not in st.session_state:
     st.session_state.summaries = {}
 
+if "summaries_done" not in st.session_state:
+    st.session_state.summaries_done = False
+
 if "doc_hashes" not in st.session_state:
     st.session_state.doc_hashes = set()
 
@@ -431,48 +434,45 @@ if uploaded_files and st.session_state.processing_started:
     if st.session_state.embeddings is None:
         st.write(f"🔥 {text["processing_docs"]}")
         st.session_state.embeddings = ingest_files(uploaded_files)
-    
-    files_shown = 0
 
     st.header(f"📋 {text["summary_of_documents"]}")
 
-    with st.spinner(text["summary_generating"]):        
+    if not st.session_state.summaries_done:
+        with st.spinner(text["summary_generating"]):        
 
+            for uploaded_file in uploaded_files:
+
+                # hash the file to avoid re-processing
+                h = file_hash(uploaded_file)
+
+                if h not in st.session_state.doc_hashes:
+
+                    content = st.session_state.doc_contents.get(h, "")
+                    
+                    if content:                
+                        summary = summarize_document(content)
+                        st.session_state.summaries[h] = {
+                            "name": uploaded_file.name,
+                            "summary": summary,
+                        }
+                        st.session_state.doc_hashes.add(h)
+                    
+                    else:
+                        st.warning(f"⚠️ {text["no_content_found"]} ({uploaded_file.name})")
+                        st.session_state.summaries[h] = {
+                            "name": uploaded_file.name,
+                            "summary": "⚠️ " + text["no_content_found"],
+                        }              
+                
+        # show summaries without spinner on re-runs
+        files_shown = 0 
         for uploaded_file in uploaded_files:
-
-            # hash the file to avoid re-processing
             h = file_hash(uploaded_file)
-
-            if h not in st.session_state.doc_hashes:
-
-                content = st.session_state.doc_contents.get(h, "")
-                
-                if content:                
-                    summary = summarize_document(content)
-                    st.session_state.summaries[h] = {
-                        "name": uploaded_file.name,
-                        "summary": summary,
-                    }
-                    st.session_state.doc_hashes.add(h)
-                
-                else:
-                    st.warning(f"⚠️ {text["no_content_found"]} ({uploaded_file.name})")
-                    st.session_state.summaries[h] = {
-                        "name": uploaded_file.name,
-                        "summary": "⚠️ " + text["no_content_found"],
-                    }
-
-            # display the summary (expanded for only the first file to avoid lengthy UI)
-
-            expanded = True if files_shown == 0 else False
-            with st.expander(f"{text["summary"]} ({uploaded_file.name})", expanded=expanded):
+            expanded = (files_shown == 0)
+            with st.expander(f"{text['summary']} ({uploaded_file.name})", expanded=expanded):
                 summary_data = st.session_state.summaries.get(h)
-                if summary_data and summary_data.get("summary"):
-                    st.write(summary_data["summary"])
-                else:
-                    st.write(f"⚠️ {text["no_summary_could_be_made"]}")
+                st.write(summary_data["summary"] if summary_data else f"⚠️ {text['no_summary_could_be_made']}")
             files_shown += 1
-        
 
 # =========================================================
 # CHAT
