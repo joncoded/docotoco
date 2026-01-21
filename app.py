@@ -183,7 +183,7 @@ uploaded_files = st.file_uploader(
     key = f"pdf_uploader_{st.session_state.uploader_key}",
 )
 
-with st.expander("⚙️ Settings", expanded=True):
+with st.expander(f"⚙️ {text['settings']}", expanded=True):
 
     # "How would you like to summarize each PDF?"
     st.text(text["settings_docs_question"])
